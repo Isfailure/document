@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/default/easyui.css">
+  <link rel="stylesheet" type="text/css" href="http://www.jeasyui.com/easyui/themes/icon.css">
+  <link rel="stylesheet" type="text/css" href="media/css/bootstrap.css">
+  <script type="application/javascript" src="media/js/jquery-3.3.1.js"></script>
+  <script type="application/javascript" src="media/js/jquery.easyui.min.js"></script>
+  <script type="application/javascript" src="media/plugins/layui/layui.js"></script>
+  <script type="application/javascript" src="media/js/vue.min.js"></script>
+  <script type="application/javascript" src="media/js/main.js"></script>
+  <style type="text/css">
+    .layui-laypage{
+      height: 100%;
+    }
+  </style>
+  <script>
+    //注意：导航 依赖 element 模块，否则无法进行功能性操作
+    layui.use('element', function () {
+      var element = layui.element;
+
+      //…
+    });
+  </script>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="container-fluid">
+  <!-- Main content -->
+  <section class="content">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+
+          <div class="card-header">
+            <h3 class="card-title" align="center">电子列表</h3>
+          </div>
+          <div>
+          <select id="d2">
+            <option value="0">全部...</option>
+            <option v-for="t in ob" :value="t.id">{{t.name}}</option>
+          </select>
+            <button class="btn btn-info"  onclick="select()">查询</button>
+            <button class="btn btn-info" onclick="add()">新增电子文档</button>
+            <!-- -->
+          </div>
+          <!-- /.card-header -->
+          <div class="card-body" id="d1">
+            <table id="example1" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>文档编号</th>
+                <th>文档名称</th>
+                <th>文档摘要</th>
+                <th>上传人</th>
+                <th>上传时间</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tbody >
+              <tr v-for="d in obj">
+                <td>{{d.id}}</td>
+                <td>{{d.dname}}</td>
+                <td>{{d.dcontent}}</td>
+                <td>{{d.uname}}</td>
+                <td>{{d.createdate}}</td>
+                <td>
+                  <button class="btn btn-info"   @click="edit(d.id)">编辑</button>
+                  <button class="btn btn-info"  @click="elete(d.id)">删除</button>
+                </td>
+              </tr>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td colspan="6" align="right">
+                  <div id="dvpage"></div>
+                </td>
+              </tr>
+              </tfoot>
+            </table>
+            <div id="demo20">
+              <ul id="house_list">
+              </ul>
+            </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </section>
+
+</div>
+<!-- ./wrapper -->
+<script type="text/javascript">
+  var v = new Vue({
+    el: '#d1',
+    data: {obj: []}
+  });
+  layui.use(['laypage'], function () {
+    var laypage = layui.laypage;
+    //调用分页
+    laypage.render({
+      elem: 'house_list'
+      , count: 12
+      , limit: 3
+      , layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+      , jump: function (obj) {
+        var start = (obj.curr - 1) * obj.limit;
+        $.ajax({
+          type: "get",
+          url: "list.do",
+          data: {star: start, limit: obj.limit},
+          dataType: "json",
+          success: function (data) {
+            if (data.code == 1) {
+              v.obj = data.info;
+
+            } else {
+              layer.msg(data.info);
+            }
+          }
+
+        })
+      }
+    });
+
+  });
+  var load = new Vue({
+    el: '#d2',
+    data: {ob: []}
+  });
+
+    $.ajax({
+      type:"get",
+      url:"alltype.do",
+      dataType:"json",
+      success: function (data) {
+        if (data.code == 1) {
+          load.ob = data.info;
+        }
+      }
+    })
+  function select(){
+    $.ajax({
+      type:"get",
+      url:"bytype.do",
+      data:{id:$("#d2").val()},
+      dataType:"json",
+      success: function (data) {
+        if (data.code == 1) {
+          v.obj = data.info;
+        }
+      }
+    })
+  }
+  function add(){
+      var tid = $("#d2").val();
+      window.location.href="add.html?tid="+tid
+  }
+  function edit(d){
+    //var id = $("#d2").val();
+    window.location.href="edit.html?id="+d
+  }
+
+  function elete(d1){
+    if(confirm("是否确认删除数据？")){
+      $.ajax({
+        type:"get",
+        url:"delete.do?id="+d1,
+        dataType:"json",
+        success:function(data){
+          if(data.code == 1){
+            window.location.href = "document.html";
+          }else{
+            alert(data.info);
+          }
+        }
+      })
+
+    }
+
+  }
+
+
+
+
+</script>
+<!--
+<script type="text/javascript">
+  var load = new Vue({
+    el: '#d1',
+    data: {ob: []}
+  });
+$(function(){
+  $.ajax({
+    type:"get",
+    url:"addtype.do",
+    dataType:"json",
+    success:function(data){
+      if(data.code == 1){
+        load.ob=data.info;
+      }
+    }
+  })
+})
+
+</script>
+-->
+
+
+</body>
+</html>
+
+
+

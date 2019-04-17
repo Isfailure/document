@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="application/javascript" src="media/js/jquery-3.3.1.js"></script>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="container-fluid">
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+          <!-- left column -->
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">增加电子文档</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form role="form" id="fm1" onsubmit="return false;">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label>文档名称：</label>
+                    <input type="text" class="form-control" id="dname" name="dname" placeholder="请输入用户名……">
+                  </div>
+                  <div class="form-group">
+                    <label for="password">文档摘要：</label>
+                    <input type="text" class="form-control" name="dcontent" id="password" placeholder="请输入密码……">
+                  </div>
+                  <div class="form-group">
+                    <label>上传人：</label>
+                    <input type="text" class="form-control" id="uname" name="uname" placeholder="请输入用户名……">
+                  </div>
+                  <div>
+                    <label>上传时间：</label>
+                    <input type="date" class="form-control" id="createdate" name="createdate" placeholder="请
+                   </div>
+                  </div>
+                </div>
+                </br >
+                <!-- /.card-body -->
+                <div class="card-footer" style="text-align: center">
+                    <div>
+                  <button type="submit" class="btn btn-primary">提交</button>
+                      <button type="button" onclick="tj()" class="btn btn-primary">返回</button>
+
+                    </div>
+                  </div>
+              </form>
+            </div>
+            <!-- /.card -->
+        </div>
+        </div>
+    </section>
+</div>
+<script type="application/javascript">
+  var tid = window.location.search;
+  $("form").submit(function(){
+    $.ajax({
+      type:"post",
+      url:"add.do"+tid,
+      data:$("form").serialize(),
+      dataType:"json",
+      success:function(data){
+        if(data.code == 1){
+          window.location.href = "document.html";
+        }else{
+          alert(data.info);
+        }
+      }
+    })
+  })
+
+</script>
+</body>
+</html>
